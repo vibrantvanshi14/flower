@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flower Bouquet Assembly Animation</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: radial-gradient(circle at center, #fdfbfb 0%, #ebedee 100%);
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+    }
+
+    .canvas-container {
+      position: relative;
+      width: 400px;
+      height: 450px;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* Animation Keyframes */
+    @keyframes stemGrow {
+      0% {
+        stroke-dashoffset: 300;
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+      }
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      70% {
+        transform: scale(1.15);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes wrapSlideUp {
+      0% {
+        transform: translateY(120px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes tieRibbon {
+      0% {
+        transform: scaleX(0);
+        opacity: 0;
+      }
+      100% {
+        transform: scaleX(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes gentleSway {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(1.5deg); }
+    }
+
+    /* Bouquet Container Sway after assembly */
+    .bouquet {
+      transform-origin: 200px 380px;
+      animation: gentleSway 4s ease-in-out 4.5s infinite;
+    }
+
+    /* Back Wrapping Paper */
+    .wrap-back {
+      opacity: 0;
+      animation: wrapSlideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+    }
+
+    /* Stems */
+    .stem {
+      fill: none;
+      stroke: #4a7c59;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 300;
+      stroke-dashoffset: 300;
+    }
+    .stem-1 { animation: stemGrow 0.8s ease-out 0.8s forwards; }
+    .stem-2 { animation: stemGrow 0.8s ease-out 1.0s forwards; }
+    .stem-3 { animation: stemGrow 0.8s ease-out 1.2s forwards; }
+    .stem-4 { animation: stemGrow 0.8s ease-out 1.4s forwards; }
+    .stem-5 { animation: stemGrow 0.8s ease-out 1.6s forwards; }
+
+    /* Leaves */
+    .leaf {
+      fill: #68b0ab;
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+    .leaf-1 { animation: popIn 0.5s ease-out 1.5s forwards; }
+    .leaf-2 { animation: popIn 0.5s ease-out 1.6s forwards; }
+    .leaf-3 { animation: popIn 0.5s ease-out 1.7s forwards; }
+    .leaf-4 { animation: popIn 0.5s ease-out 1.8s forwards; }
+
+    /* Flower Heads (Inner groups scale cleanly at 0,0 relative to parent position) */
+    .flower {
+      opacity: 0;
+      transform-origin: 0px 0px;
+    }
+    .flower-1 { animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.9s forwards; }
+    .flower-2 { animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 2.1s forwards; }
+    .flower-3 { animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 2.3s forwards; }
+    .flower-4 { animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 2.5s forwards; }
+    .flower-5 { animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 2.7s forwards; }
+
+    /* Front Wrapping Paper */
+    .wrap-front {
+      opacity: 0;
+      animation: wrapSlideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) 3.2s forwards;
+    }
+
+    /* Ribbon Bow */
+    .ribbon {
+      transform-origin: 200px 320px;
+      opacity: 0;
+      animation: tieRibbon 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 3.8s forwards;
+    }
+
+    /* Replay Button */
+    button {
+      margin-top: 20px;
+      padding: 10px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      background-color: #ff6b81;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 107, 129, 0.4);
+      transition: transform 0.2s, background-color 0.2s;
+    }
+    button:hover {
+      background-color: #ff4757;
+      transform: translateY(-2px);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="canvas-container" id="stage">
+    <svg viewBox="0 0 400 450" id="bouquet-svg">
+      <g class="bouquet">
+        <!-- 1. Back Kraft Paper Cone -->
+        <polygon class="wrap-back" points="200,410 85,180 200,130 315,180" fill="#d4a373" />
+        <polygon class="wrap-back" points="200,410 100,190 200,145 300,190" fill="#faedcd" />
+
+        <!-- 2. Stems (Drawn from bottom up) -->
+        <path class="stem stem-1" d="M 200,360 Q 200,230 200,110" />
+        <path class="stem stem-2" d="M 200,360 Q 170,250 140,140" />
+        <path class="stem stem-3" d="M 200,360 Q 230,250 260,140" />
+        <path class="stem stem-4" d="M 200,360 Q 180,270 165,185" />
+        <path class="stem stem-5" d="M 200,360 Q 220,270 235,185" />
+
+        <!-- 3. Leaves -->
+        <path class="leaf leaf-1" d="M 170,230 Q 130,210 135,240 Q 155,245 170,230 Z" />
+        <path class="leaf leaf-2" d="M 230,230 Q 270,210 265,240 Q 245,245 230,230 Z" />
+        <path class="leaf leaf-3" d="M 145,190 Q 105,170 110,200 Q 130,205 145,190 Z" />
+        <path class="leaf leaf-4" d="M 255,190 Q 295,170 290,200 Q 270,205 255,190 Z" />
+
+        <!-- 4. Flowers (Outer <g> sets position; inner <g> animates scale) -->
+        <!-- Flower 1: Top Center Coral Rose -->
+        <g transform="translate(200, 110)">
+          <g class="flower flower-1">
+            <circle cx="0" cy="-16" r="16" fill="#ff6b6b" />
+            <circle cx="15" cy="-5" r="16" fill="#ff6b6b" />
+            <circle cx="10" cy="13" r="16" fill="#ff6b6b" />
+            <circle cx="-10" cy="13" r="16" fill="#ff6b6b" />
+            <circle cx="-15" cy="-5" r="16" fill="#ff6b6b" />
+            <circle cx="0" cy="0" r="14" fill="#ee5253" />
+            <circle cx="0" cy="0" r="7" fill="#feca57" />
+          </g>
+        </g>
+
+        <!-- Flower 2: Left Sunflower/Daisy -->
+        <g transform="translate(140, 140)">
+          <g class="flower flower-2">
+            <ellipse cx="0" cy="-18" rx="7" ry="15" fill="#feca57" />
+            <ellipse cx="0" cy="18" rx="7" ry="15" fill="#feca57" />
+            <ellipse cx="-18" cy="0" rx="15" ry="7" fill="#feca57" />
+            <ellipse cx="18" cy="0" rx="15" ry="7" fill="#feca57" />
+            <ellipse cx="-13" cy="-13" rx="11" ry="11" fill="#ff9f43" />
+            <ellipse cx="13" cy="13" rx="11" ry="11" fill="#ff9f43" />
+            <ellipse cx="-13" cy="13" rx="11" ry="11" fill="#ff9f43" />
+            <ellipse cx="13" cy="-13" rx="11" ry="11" fill="#ff9f43" />
+            <circle cx="0" cy="0" r="11" fill="#5f27cd" />
+          </g>
+        </g>
+
+        <!-- Flower 3: Right Pink Blossom -->
+        <g transform="translate(260, 140)">
+          <g class="flower flower-3">
+            <circle cx="0" cy="-15" r="14" fill="#ff9ff3" />
+            <circle cx="14" cy="-4" r="14" fill="#ff9ff3" />
+            <circle cx="9" cy="12" r="14" fill="#ff9ff3" />
+            <circle cx="-9" cy="12" r="14" fill="#ff9ff3" />
+            <circle cx="-14" cy="-4" r="14" fill="#ff9ff3" />
+            <circle cx="0" cy="0" r="9" fill="#f368e0" />
+            <circle cx="0" cy="0" r="4" fill="#fff" />
+          </g>
+        </g>
+
+        <!-- Flower 4: Front-Left Lavender Flower -->
+        <g transform="translate(165, 185)">
+          <g class="flower flower-4">
+            <circle cx="0" cy="-14" r="13" fill="#a29bfe" />
+            <circle cx="13" cy="-4" r="13" fill="#a29bfe" />
+            <circle cx="8" cy="11" r="13" fill="#a29bfe" />
+            <circle cx="-8" cy="11" r="13" fill="#a29bfe" />
+            <circle cx="-13" cy="-4" r="13" fill="#a29bfe" />
+            <circle cx="0" cy="0" r="8" fill="#6c5ce7" />
+            <circle cx="0" cy="0" r="4" fill="#ffeaa7" />
+          </g>
+        </g>
+
+        <!-- Flower 5: Front-Right Peach Tulip/Rose -->
+        <g transform="translate(235, 185)">
+          <g class="flower flower-5">
+            <circle cx="0" cy="-14" r="14" fill="#ff7675" />
+            <circle cx="13" cy="-4" r="14" fill="#ff7675" />
+            <circle cx="8" cy="11" r="14" fill="#ff7675" />
+            <circle cx="-8" cy="11" r="14" fill="#ff7675" />
+            <circle cx="-13" cy="-4" r="14" fill="#ff7675" />
+            <circle cx="0" cy="0" r="9" fill="#d63031" />
+            <circle cx="0" cy="0" r="4" fill="#fab1a0" />
+          </g>
+        </g>
+
+        <!-- 5. Front Wrapping Paper Flaps -->
+        <polygon class="wrap-front" points="200,410 105,225 215,270" fill="#e9c46a" />
+        <polygon class="wrap-front" points="200,410 295,225 185,270" fill="#ddb892" />
+
+        <!-- 6. Ribbon & Bow -->
+        <g class="ribbon">
+          <!-- Ribbon Band -->
+          <path d="M 162,315 Q 200,325 238,315 L 234,327 Q 200,337 166,327 Z" fill="#e63946" />
+          <!-- Left Bow Loop -->
+          <path d="M 200,322 C 170,300 160,335 200,325" fill="#ff4d6d" />
+          <!-- Right Bow Loop -->
+          <path d="M 200,322 C 230,300 240,335 200,325" fill="#ff4d6d" />
+          <!-- Ribbon Tails -->
+          <path d="M 197,325 L 180,365 L 190,362 Z" fill="#e63946" />
+          <path d="M 203,325 L 220,365 L 210,362 Z" fill="#e63946" />
+          <!-- Center Knot -->
+          <rect x="194" y="317" width="12" height="12" rx="3" fill="#c9184a" />
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <button onclick="replayAnimation()">Replay Bouquet</button>
+
+  <script>
+    function replayAnimation() {
+      const stage = document.getElementById('stage');
+      const svg = document.getElementById('bouquet-svg');
+      const clone = svg.cloneNode(true);
+      stage.replaceChild(clone, svg);
+    }
+  </script>
+
+</body>
+</html>
